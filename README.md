@@ -10,6 +10,8 @@ Also trying to keep DOM code with the HTML. I'm not sure how useful this is, but
 - [Vue(100%)](vue/src/App.vue)
 - [Svelte(100%)](svelte/src/App.svelte)
 
+![Line Perfect](media/linePerfect.jpg)
+
 
 [Contributing](https://github.com/icetbr/my-projects/blob/main/CONTRIBUTING.md)\
 [License (MIT)](https://choosealicense.com/licenses/mit/)
