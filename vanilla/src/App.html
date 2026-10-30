@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Vanilla JS TodoMVC</title>
+</head>
+<body>
+  <section class="todoapp"></section>
+
+  <script>
+    const STORAGE_KEY = 'todos-vanilla';
+
+    let filter = 'all';
+    let editingIndex = null;
+    let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    const filters = {
+      all: (todos) => todos,
+      active: (todos) => todos.filter(todo => !todo.completed),
+      completed: (todos) => todos.filter(todo => todo.completed)
+    };
+
+    const filteredTodos = () => filters[filter](todos);
+    const remainingCount = () => todos.filter(todo => !todo.completed).length;
+
+    const saveTodos = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+
+    const clearCompleted = () => {
+      todos = filters.active(todos);
+      saveTodos();
+      render();
+    };
+
+    const toggleAll = (event) => {
+      todos.forEach(todo => todo.completed = event.target.checked);
+      saveTodos();
+      render();
+    };
+
+    const remove = (index) => {
+      todos.splice(index, 1);
+      saveTodos();
+      render();
+    };
+
+    const edit = (index) => {
+      editingIndex = index;
+      render();
+      setTimeout(() => {
+        const input = document.querySelector('.edit');
+        if (input) input.focus();
+      }, 0);
+    };
+
+    const cancel = () => {
+      editingIndex = null;
+      render();
+    };
+
+    const create = (title) => {
+      todos.push({ id: Date.now(), title, completed: false });
+      saveTodos();
+      render();
+    };
+
+    const updateView = () => {
+      filter = location.hash.slice(2) || 'all';
+      render();
+    };
+
+    const update = (title) => {
+      if (title) {
+        todos[editingIndex].title = title;
+      } else {
+        remove(editingIndex);
+        return;
+      }
+      editingIndex = null;
+      saveTodos();
+      render();
+    };
+
+    const toggleTodo = (index) => {
+      todos[index].completed = !todos[index].completed;
+      saveTodos();
+      render();
+    };
+
+    function render() {
+      const app = document.querySelector('.todoapp');
+
+      app.innerHTML = `
+        <header class="header">
+          <h1>todos</h1>
+          <input class="new-todo" autofocus placeholder="What needs to be done?" required pattern=".*\\S+.*">
+        </header>
+        ${todos.length ? `
+          <section class="main">
+            <input id="toggle-all" class="toggle-all" type="checkbox" ${!remainingCount() ? 'checked' : ''}>
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list">
+              ${filteredTodos().map((todo, index) => `
+                <li class="todo ${todo.completed ? 'completed' : ''} ${editingIndex === index ? 'editing' : ''}" data-index="${index}">
+                  <div class="view">
+                    <input class="toggle" type="checkbox" ${todo.completed ? 'checked' : ''} data-toggle="${index}">
+                    <label data-edit="${index}">${todo.title}</label>
+                    <button class="destroy" data-remove="${index}"></button>
+                  </div>
+                  ${editingIndex === index ? `
+                    <input class="edit" value="${todo.title}" data-update="${index}">
+                  ` : ''}
+                </li>
+              `).join('')}
+            </ul>
+          </section>
+        ` : ''}
+        ${todos.length ? `
+          <footer class="footer">
+            <span class="todo-count">
+              <strong>${remainingCount()}</strong> ${remainingCount() === 1 ? 'item' : 'items'} left
+            </span>
+            <ul class="filters">
+              <li><a href="#/all" class="${filter === 'all' ? 'selected' : ''}">All</a></li>
+              <li><a href="#/active" class="${filter === 'active' ? 'selected' : ''}">Active</a></li>
+              <li><a href="#/completed" class="${filter === 'completed' ? 'selected' : ''}">Completed</a></li>
+            </ul>
+            ${remainingCount() < todos.length ? `
+              <button class="clear-completed">Clear completed</button>
+            ` : ''}
+          </footer>
+        ` : ''}
+      `;
+
+      // Event listeners
+      const newTodoInput = app.querySelector('.new-todo');
+      if (newTodoInput) {
+        newTodoInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && e.target.checkValidity()) {
+            const value = e.target.value.trim();
+            if (value) {
+              create(value);
+              e.target.value = '';
+            }
+          }
+        });
+      }
+
+      const toggleAllCheckbox = app.querySelector('.toggle-all');
+      if (toggleAllCheckbox) {
+        toggleAllCheckbox.addEventListener('change', toggleAll);
+      }
+
+      app.querySelectorAll('[data-toggle]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          const index = parseInt(e.target.dataset.toggle);
+          toggleTodo(index);
+        });
+      });
+
+      app.querySelectorAll('[data-edit]').forEach(label => {
+        label.addEventListener('dblclick', (e) => {
+          const index = parseInt(e.target.dataset.edit);
+          edit(index);
+        });
+      });
+
+      app.querySelectorAll('[data-remove]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.remove);
+          remove(index);
+        });
+      });
+
+      const editInput = app.querySelector('.edit');
+      if (editInput) {
+        editInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            update(e.target.value.trim());
+          } else if (e.key === 'Escape') {
+            cancel();
+          }
+        });
+        editInput.addEventListener('blur', (e) => {
+          update(e.target.value.trim());
+        });
+      }
+
+      const clearButton = app.querySelector('.clear-completed');
+      if (clearButton) {
+        clearButton.addEventListener('click', clearCompleted);
+      }
+    }
+
+    // Initialize
+    window.addEventListener('hashchange', updateView);
+    updateView();
+  </script>
+</body>
+</html>

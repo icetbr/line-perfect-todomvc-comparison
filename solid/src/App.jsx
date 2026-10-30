@@ -39,12 +39,12 @@ export default () => {
         <h1>todos</h1>
         <input class="new-todo" autofocus placeholder="What needs to be done?" required pattern=".*\S+.*"
           onkeydown={e => e.key ==='Enter' && e.target.checkValidity() && create(e.target.value.trim())}
-          onkeyup={e => e.key ==='Enter' ? e.target.value = '' : ''}>
+          onkeyup={e => e.key ==='Enter' ? e.target.value = '' : ''} />
       </header>
 
       <Show when={todos().length}>
         <section class="main">
-          <input id="toggle-all" class="toggle-all" type="checkbox" checked={!remainingCount()} onchange={e => toggleAll(e.target.checked)}>
+          <input id="toggle-all" class="toggle-all" type="checkbox" checked={!remainingCount()} onchange={e => toggleAll(e.target.checked)} />
           <label for="toggle-all">Mark all as complete</label>
 
           <ul class="todo-list">
@@ -53,7 +53,7 @@ export default () => {
                 <li class="todo" classList={{ completed: todo.completed, editing: editingIndex() === index }}>
 
                   <div class="view">
-                    <input class="toggle" type="checkbox" checked={todo.completed} onchange={e => toggle(index, e.target.checked)}>
+                    <input class="toggle" type="checkbox" checked={todo.completed} onchange={e => toggle(index, e.target.checked)} />
                     <label ondblclick={[edit, index]}>{todo.title}</label>
                     <button class="destroy" onclick={[remove, index]} />
                   </div>
@@ -63,7 +63,7 @@ export default () => {
                       onkeydown={e =>
                         e.key ==='Enter' ? update(e.target.value.trim()) :
                         e.key ==='Escape' && cancel()}
-                      onblur={e => update(e.target.value.trim())}>
+                      onblur={e => update(e.target.value.trim())} />
                   </Show>
                 </li>
               )}
@@ -77,8 +77,8 @@ export default () => {
           </span>
           <ul class="filters">
             <li><a href="#/all" classList={{selected: filter() === 'all'}}>All</a></li>
-            <li><a href="#/active" classList={{selected: filter() 'active'}>Active</a></li>
-            <li><a href="#/completed" classList={{selected: filter() 'completed'}>Completed</a></li>
+            <li><a href="#/active" classList={{selected: filter() === 'active'}}>Active</a></li>
+            <li><a href="#/completed" classList={{selected: filter() === 'completed'}}>Completed</a></li>
           </ul>
           <Show when={remainingCount()}>
             <button class="clear-completed" onclick={clearCompleted}>Clear completed</button>

@@ -1,0 +1,96 @@
+<!-- see https://www.reddit.com/r/htmx/comments/1b1jgrw/key_differences_of_alpinejs_and_hyperscript/ -->
+
+<script src="//cdn.tailwindcss.com"></script>
+<script src="//unpkg.com/hyperscript.org@0.9.12"></script>
+<div class="w-80 bg-blue-500">
+  <div class="flex cursor-pointer justify-between p-2" aria-expanded="false" _="
+      on click
+         set content to the next <div/>
+         set @aria-expanded to ( @aria-expanded == 'false' )
+         set *height of content to (content's scrollHeight * ( @aria-expanded == 'true' )) + 'px'
+         toggle .-scale-y-100 on <span/> in me
+      end
+  ">
+    <label class="cursor-pointer">Accordion - hyperscript</label>
+    <span class="transition-transform">V</span>
+  </div>
+  <div class="h-0 overflow-hidden px-2 transition-height duration-150 ease">
+    <ol>
+      <li>A</li>
+      <li>B</li>
+      <li>C</li>
+    </ol>
+  </div>
+</div>
+
+<script src="//unpkg.com/alpinejs" defer></script>
+<div class="w-80 bg-teal-500" x-data="{
+    open: false,
+    toggle() {
+        this.open = !this.open;
+        this.$nextTick(() => {
+            const content = this.$refs.content;
+            content.style.height = (this.open ? content.scrollHeight : '0') + 'px';
+        });
+    }
+}">
+    <div @click="toggle" class="flex cursor-pointer justify-between p-2" :aria-expanded="open.toString()">
+        <label class="cursor-pointer">Accordion - alpine.js</label>
+        <span x-bind:class="{'-scale-y-100': open}" class="transition-transform">V</span>
+    </div>
+    <div x-ref="content" class="h-0 overflow-hidden px-2 transition-height duration-150 ease">
+        <ol>
+            <li>A</li>
+            <li>B</li>
+            <li>C</li>
+        </ol>
+    </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js"></script>
+<div class="w-80 bg-green-500">
+	<div class="flex cursor-pointer justify-between p-2" aria-expanded="false">
+		<script>
+			me().on('click', e=>{
+				const content = me(e).nextElementSibling
+				const expand = me(e).attr('aria-expanded') == 'false'
+                me(e).attr('aria-expanded', expand)
+                me(e).lastElementChild.classList.toggle('-scale-y-100')
+ 			    content.style.height = (expand ? content.scrollHeight : '0') + 'px'
+			})
+		</script>
+		<label class="cursor-pointer">Accordion - surreal</label>
+		<span class="transition-transform">V</span>
+	</div>
+	<div class="h-0 overflow-hidden px-2 transition-height duration-150 ease">
+		<ol>
+			<li>A</li>
+			<li>B</li>
+			<li>C</li>
+		</ol>
+	</div>
+</div>
+
+<div class="w-80 bg-yellow-500">
+	<div class="flex cursor-pointer justify-between p-2" aria-expanded="false">
+		<script>
+      const el = document.currentScript.parentElement;
+			el.addEventListener('click', e=>{
+				const content = el.nextElementSibling
+				const expand = el.getAttribute('aria-expanded') == 'false'
+        el.setAttribute('aria-expanded', expand)
+        el.lastElementChild.classList.toggle('-scale-y-100')
+ 			  content.style.height = (expand ? content.scrollHeight : '0') + 'px'
+			})
+		</script>
+		<label class="cursor-pointer">Accordion - vanilla JS</label>
+		<span class="transition-transform">V</span>
+	</div>
+	<div class="h-0 overflow-hidden px-2 transition-height duration-150 ease">
+		<ol>
+			<li>A</li>
+			<li>B</li>
+			<li>C</li>
+		</ol>
+	</div>
+</div>

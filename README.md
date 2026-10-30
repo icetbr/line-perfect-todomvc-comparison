@@ -20,3 +20,7 @@ I started this for learning, and I'm not sure I'll work on it very often. Though
 
 [Contributing](https://github.com/icetbr/my-projects/blob/main/CONTRIBUTING.md)\
 [License (MIT)](https://choosealicense.com/licenses/mit/)
+
+<!-- Make sure to .trim() the input and then check that it's not empty before creating a new todo.
+If it's empty the todo should instead be destroyed. If escape is pressed during the edit, the edit state should be left and any changes be discarded
+Make sure the active filter is persisted on reload -->
